@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Şahin Hukuk Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f8f8f8;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    }
+    textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #004aad;
+      color: white;
+      cursor: pointer;
+    }
+    #response {
+      white-space: pre-line;
+      margin-top: 20px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h2>Şahin Hukuk Bilgi Asistanı</h2>
+  <p>Lütfen sorunuzu yazın:</p>
+  <textarea id="userInput" rows="4" placeholder="Örn: Ceza hukuku nedir?"></textarea>
+  <button onclick="sendMessage()">Gönder</button>
+  <div id="response"></div>
+
+  <script>
+    async function sendMessage() {
+      const userMessage = document.getElementById("userInput").value;
+      const responseDiv = document.getElementById("response");
+      responseDiv.innerText = "Yükleniyor...";
+
+      try {
+        const res = await fetch("https://sahinhukuk-keywordbot.cannnsahinnn.workers.dev/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await res.json();
+        responseDiv.innerText = data.reply;
+      } catch (err) {
+        responseDiv.innerText = "Sunucuya erişilemedi: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
