@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Şahin Hukuk Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f8f8f8; }
+    h1 { color: #2d2d2d; text-align: center; }
+    textarea { width: 100%; height: 100px; padding: 10px; font-size: 16px; }
+    button { margin-top: 10px; padding: 10px 20px; font-size: 16px; background: #333; color: #fff; border: none; cursor: pointer; }
+    .response { margin-top: 20px; white-space: pre-wrap; background: #fff; padding: 15px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Şahin Hukuk Asistanı</h1>
+  <p>Sorunuzu aşağıya yazın, içeriklerimize göre bilgi verelim. (Kesin ve bağlayıcı hukuki görüş içermez)</p>
+  <textarea id="question" placeholder="Sorunuzu yazın..."></textarea>
+  <button onclick="ask()">Sor</button>
+  <div class="response" id="responseBox"></div>
+
+  <script>
+    async function ask() {
+      const question = document.getElementById("question").value.trim();
+      if (!question) {
+        alert("Lütfen bir soru yazın.");
+        return;
+      }
+
+      document.getElementById("responseBox").innerText = "Yükleniyor...";
+
+      try {
+        const res = await fetch("https://sahinhukuk-chatbot.cannnsahinnn.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: question })
+        });
+
+        const data = await res.json();
+        document.getElementById("responseBox").innerText = data.reply || "Yanıt alınamadı.";
+      } catch (err) {
+        document.getElementById("responseBox").innerText = "Sunucu hatası: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
