@@ -2,67 +2,87 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Şahin Hukuk Chatbot</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #f8f8f8;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.1);
+      background: #f2f2f2;
+      padding: 40px;
+      color: #222;
     }
-    textarea, button {
+    .chatbox {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #003366;
+    }
+    input, button {
       width: 100%;
       padding: 12px;
-      margin-top: 12px;
+      margin-top: 10px;
       font-size: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     button {
-      background-color: #004aad;
+      background-color: #003366;
       color: white;
       cursor: pointer;
     }
+    button:hover {
+      background-color: #002244;
+    }
     #response {
-      white-space: pre-line;
       margin-top: 20px;
-      padding: 12px;
-      background: white;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      background: #eaf2f8;
+      padding: 15px;
+      border-left: 4px solid #003366;
+      border-radius: 6px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
-  <h2>Şahin Hukuk Bilgi Asistanı</h2>
-  <p>Lütfen sorunuzu yazın:</p>
-  <textarea id="userInput" rows="4" placeholder="Örn: Ceza hukuku nedir?"></textarea>
-  <button onclick="sendMessage()">Gönder</button>
-  <div id="response"></div>
+  <div class="chatbox">
+    <h2>Şahin Hukuk Bilgi Asistanı</h2>
+    <p>Sorunuzu aşağıya yazın. Web sitemizdeki bilgilere göre yönlendirme yapayım:</p>
+    <input type="text" id="question" placeholder="Örn: Boşanma sürecinde mal paylaşımı nasıl olur?" />
+    <button onclick="sendQuestion()">Gönder</button>
+    <div id="response"></div>
+  </div>
 
   <script>
-    async function sendMessage() {
-      const userMessage = document.getElementById("userInput").value;
-      const responseDiv = document.getElementById("response");
-      responseDiv.innerText = "Yükleniyor...";
+    async function sendQuestion() {
+      const question = document.getElementById("question").value.trim();
+      const resBox = document.getElementById("response");
+
+      if (!question) {
+        resBox.innerText = "Lütfen bir soru yazınız.";
+        return;
+      }
+
+      resBox.innerText = "Yanıt aranıyor...";
 
       try {
-        const res = await fetch("https://sahinhukuk-keywordbot.cannnsahinnn.workers.dev/", {
+        const response = await fetch("https://sahinhukuk-keywordbot.cannnsahinnn.workers.dev/", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ message: userMessage })
+          body: JSON.stringify({ message: question })
         });
 
-        const data = await res.json();
-        responseDiv.innerText = data.reply;
-      } catch (err) {
-        responseDiv.innerText = "Sunucuya erişilemedi: " + err.message;
+        const data = await response.json();
+        resBox.innerText = data.reply || "Yanıt alınamadı.";
+      } catch (e) {
+        resBox.innerText = "Sunucuya ulaşılamadı.";
       }
     }
   </script>
