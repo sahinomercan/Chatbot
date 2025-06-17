@@ -7,117 +7,63 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f8f8f8;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
-
-    h1 {
-      text-align: center;
-      background: #243749;
-      color: white;
-      margin: 0;
-      padding: 15px 10px;
-    }
-
-    #chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      background: white;
-    }
-
-    .message {
-      margin: 10px 0;
-    }
-
-    .user {
-      text-align: right;
-      color: #007bff;
-    }
-
-    .bot {
-      text-align: left;
-      color: #333;
-    }
-
-    #chat-form {
-      display: flex;
-      border-top: 1px solid #ccc;
-      background: #fff;
-      padding: 10px;
-    }
-
-    #message-input {
-      flex: 1;
-      padding: 10px;
+    textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      font-size: 16px;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-right: 10px;
     }
-
     button {
-      padding: 10px 15px;
-      background: #243749;
+      background-color: #004aad;
       color: white;
-      border: none;
-      border-radius: 4px;
       cursor: pointer;
     }
-
-    button:hover {
-      background: #1b2c3a;
+    #response {
+      white-space: pre-line;
+      margin-top: 20px;
+      padding: 12px;
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 <body>
-  <h1>Şahin Hukuk Chatbot</h1>
-  <div id="chat-box"></div>
-  <form id="chat-form">
-    <input type="text" id="message-input" placeholder="Sorunuzu yazın..." autocomplete="off" required />
-    <button type="submit">Gönder</button>
-  </form>
+  <h2>Şahin Hukuk Bilgi Asistanı</h2>
+  <p>Lütfen sorunuzu yazın:</p>
+  <textarea id="userInput" rows="4" placeholder="Örn: Ceza hukuku nedir?"></textarea>
+  <button onclick="sendMessage()">Gönder</button>
+  <div id="response"></div>
 
   <script>
-    const chatBox = document.getElementById("chat-box");
-    const form = document.getElementById("chat-form");
-    const input = document.getElementById("message-input");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
-
-      appendMessage("user", message);
-      input.value = "";
-
-      appendMessage("bot", "Yükleniyor...");
+    async function sendMessage() {
+      const userMessage = document.getElementById("userInput").value;
+      const responseDiv = document.getElementById("response");
+      responseDiv.innerText = "Yükleniyor...";
 
       try {
-        const res = await fetch("https://sahinhukuk-chatbot.cannnsahinnn.workers.dev", {
+        const res = await fetch("https://sahinhukuk-keywordbot.cannnsahinnn.workers.dev/", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: userMessage })
         });
 
         const data = await res.json();
-        const messages = document.querySelectorAll(".bot");
-        messages[messages.length - 1].textContent = data.reply || "Şu anda cevap veremiyorum.";
+        responseDiv.innerText = data.reply;
       } catch (err) {
-        const messages = document.querySelectorAll(".bot");
-        messages[messages.length - 1].textContent = "Sunucu hatası.";
+        responseDiv.innerText = "Sunucuya erişilemedi: " + err.message;
       }
-    });
-
-    function appendMessage(sender, text) {
-      const div = document.createElement("div");
-      div.className = `message ${sender}`;
-      div.textContent = text;
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
   </script>
 </body>
